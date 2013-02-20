@@ -5,6 +5,9 @@ import scala.actors.Actor._
 
 object Main extends App {
 
+  // TODO will probably need lazy 2d array of actors so they
+  // can find each other more easily (graph, not tree!)
+
   println("hello")
   val root = new Node(0, 0, 5, 5)
   root.start()
