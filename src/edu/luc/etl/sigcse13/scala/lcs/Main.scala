@@ -28,17 +28,17 @@ object Main extends App {
     *
     */
 
-    if (p._1 == 0 || p._2 == 0)
-      0;
-    else if (c0(p._1-1) == c1(p._2-1))
+    if (p._1 == 0 || p._2 == 0) // TODO pimped edge checker
+      0
+    else if (c0(p._1 - 1) == c1(p._2 - 1)) // TODO pimp this
       ms.northwest + 1
     else
-      math.max( ms.west, ms.north);
+      math.max(ms.west, ms.north)
   }
 
   println("hello")
   val result = new SyncVar[Int]
-  val root = SystolicArray(c0.length(), c1.length(), f3, result)
+  val root = SystolicArray(c0.length, c1.length, f3, result)
   root.start()
   root ! ((-1, -1) -> 1)
   println("end result = " + result.take)
