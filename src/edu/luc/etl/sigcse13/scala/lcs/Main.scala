@@ -14,9 +14,31 @@ object Main extends App {
     ms.north + ms.northwest + ms.west
   }
 
+  val c0 = "Now is the time for all great women to come to the aid of their country";
+  val c1 = "Now all great women will come to the aid of their country";
+
+  val f3 = (p: Pos, ms: Map[Pos, Int]) => {
+    implicit val currentPosAndDefaultValue = (p, 0)
+
+    /* Java code for what to do with myself
+    if (c0[i - 1] == c1[j - 1]))
+       a[i][j] = a[i - 1][j - 1] + 1;
+    else
+       a[i][j] = Math.max(a[i - 1][j], a[i][j - 1]);
+    *
+    */
+
+    if (p._1 == 0 || p._2 == 0)
+      0;
+    else if (c0(p._1-1) == c1(p._2-1))
+      ms.northwest + 1
+    else
+      math.max( ms.west, ms.north);
+  }
+
   println("hello")
   val result = new SyncVar[Int]
-  val root = SystolicArray(3, 5, f2, result)
+  val root = SystolicArray(c0.length(), c1.length(), f3, result)
   root.start()
   root ! ((-1, -1) -> 1)
   println("end result = " + result.take)
