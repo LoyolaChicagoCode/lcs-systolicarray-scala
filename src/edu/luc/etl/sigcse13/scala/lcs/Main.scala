@@ -5,10 +5,18 @@ import scala.actors.Actor._
 import scala.concurrent.SyncVar
 
 object Main extends App {
-  import SystolicArray.Pos
+  import SystolicArray.{Pos,mapToHelper}
+
+  val f1 = (p: Pos, ms: Map[Pos, Int]) => ms.values.sum
+
+  val f2 = (p: Pos, ms: Map[Pos, Int]) => {
+    implicit val currentPosAndDefaultValue = (p, 0)
+    ms.north + ms.northwest + ms.west
+  }
+
   println("hello")
   val result = new SyncVar[Int]
-  val root = SystolicArray(3, 5, (p: Pos, ms: Map[Pos, Int]) => ms.values.sum, result)
+  val root = SystolicArray(3, 5, f1, result)
   root.start()
   root ! ((-1, -1) -> 1)
   println("end result = " + result.take)
@@ -16,7 +24,7 @@ object Main extends App {
 
 object SystolicArray {
 
-  type LazyArray[T] = Stream[Stream[Node[T]]]
+  type LazyArray[T] = Stream[Stream[Cell[T]]]
 
   type Pos = (Int, Int)
 
@@ -26,12 +34,12 @@ object SystolicArray {
     require { 0 < n }
     require { 0 < m }
     lazy val a: LazyArray[T] = Stream.tabulate(n, m) {
-      (i, j) => new Node(i, j, n, m, a, f, result)
+      (i, j) => new Cell(i, j, n, m, a, f, result)
     }
     a(0)(0)
   }
 
-  class Node[T](row: Int, col: Int, rows: Int, cols: Int, a: => LazyArray[T],
+  class Cell[T](row: Int, col: Int, rows: Int, cols: Int, a: => LazyArray[T],
       f: Acc[T], result: SyncVar[T]) extends Actor {
 
     require { 0 <= row && row < rows }
@@ -78,5 +86,13 @@ object SystolicArray {
       if (row < rows - 1 && col < cols - 1)   a(row + 1)(col + 1) ! m
       if (row >= rows - 1 && col >= cols - 1) result.set(r)
     }
+  }
+
+  implicit def mapToHelper[T](ms: Map[Pos, T]): Helper[T] = new Helper(ms)
+
+  class Helper[T](ms: Map[Pos, T]) {
+    def north    (implicit current: (Pos, T)): T = ms.get((current._1._1 - 1, current._1._2    )).getOrElse(current._2)
+    def west     (implicit current: (Pos, T)): T = ms.get((current._1._1    , current._1._2 - 1)).getOrElse(current._2)
+    def northwest(implicit current: (Pos, T)): T = ms.get((current._1._1 - 1, current._1._2 - 1)).getOrElse(current._2)
   }
 }
