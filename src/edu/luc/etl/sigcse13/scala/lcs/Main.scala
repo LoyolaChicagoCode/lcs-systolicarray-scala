@@ -14,8 +14,8 @@ object Main extends App {
     ms.north + ms.northwest + ms.west
   }
 
-  val c0 = "Now is the time for all great women to come to the aid of their country";
-  val c1 = "Now all great women will come to the aid of their country";
+  val c0 = "Now is the time for all great women to come to the aid of their country"
+  val c1 = "Now all great women will come to the aid of their country"
 
   val f3 = (p: Pos, ms: Map[Pos, Int]) => {
     implicit val currentPosAndDefaultValue = (p, 0)
