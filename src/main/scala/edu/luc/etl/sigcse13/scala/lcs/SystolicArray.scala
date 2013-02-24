@@ -1,5 +1,7 @@
 package edu.luc.etl.sigcse13.scala.lcs
 
+import org.slf4j.LoggerFactory
+
 trait SystolicArray[T] {
   def start(): Unit
   def put(v: T): Unit
@@ -11,6 +13,8 @@ object SystolicArray {
   import scala.actors.Actor._
   import scala.concurrent.SyncVar
 
+  private val logger = LoggerFactory.getLogger(getClass)
+
   private type LazyArray[T] = Stream[Stream[Cell[T]]]
 
   type Pos = (Int, Int)
@@ -18,8 +22,6 @@ object SystolicArray {
   type Acc[T] = (Pos, Map[Pos, T]) => T
 
   private val DEBUG = false
-
-  private def log(s: => String) { if (DEBUG) println(s) }
 
   def apply[T](rows: Int, cols: Int, f: Acc[T]): SystolicArray[T] = {
     require { 0 < rows }
@@ -42,13 +44,13 @@ object SystolicArray {
     require { 0 <= row && row < rows }
     require { 0 <= col && col < cols }
 
-    log("creating (" + row + ", " + col + ")")
+    logger.debug("creating (" + row + ", " + col + ")")
 
     override def act() {
-      log("starting (" + row + ", " + col + ")")
+      logger.debug("starting (" + row + ", " + col + ")")
       var start = true
       loop {
-        log("waiting  (" + row + ", " + col + ")")
+        logger.debug("waiting  (" + row + ", " + col + ")")
         barrier(if (row == 0 || col == 0) 1 else 3) { ms =>
           if (start) { startNeighbors() ; start = false }
           propagate(ms)
@@ -77,7 +79,7 @@ object SystolicArray {
     protected def propagate(ms: Map[Pos, T]) {
       val r = f((row, col), ms)
       val m = (row, col) -> r
-      log("firing   " + m)
+      logger.debug("firing   " + m)
       if (row < rows - 1)                     a(row + 1)(col    ) ! m
       if (col < cols - 1)                     a(row    )(col + 1) ! m
       if (row < rows - 1 && col < cols - 1)   a(row + 1)(col + 1) ! m
