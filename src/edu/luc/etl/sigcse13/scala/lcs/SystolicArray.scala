@@ -1,67 +1,38 @@
 package edu.luc.etl.sigcse13.scala.lcs
 
-import scala.actors.Actor
-import scala.actors.Actor._
-import scala.concurrent.SyncVar
-
-object Main extends App {
-  import SystolicArray._
-
-  val f1 = (p: Pos, ms: Map[Pos, Int]) => ms.values.sum
-
-  val f2 = (p: Pos, ms: Map[Pos, Int]) => {
-    implicit val currentPosAndDefaultValue = (p, 0)
-    ms.north + ms.northwest + ms.west
-  }
-
-  val c0 = "Now is the time for all great women to come to the aid of their country"
-  val c1 = "Now all great women will come to the aid of their country"
-
-  val f3 = (p: Pos, ms: Map[Pos, Int]) => {
-    implicit val currentPosAndDefaultValue = (p, 0)
-
-    /* Java code for what to do with myself
-    if (c0[i - 1] == c1[j - 1]))
-       a[i][j] = a[i - 1][j - 1] + 1;
-    else
-       a[i][j] = Math.max(a[i - 1][j], a[i][j - 1]);
-    *
-    */
-
-    if (p.isOnEdge)
-      0
-    else if (c0(p.north) == c1(p.west))
-      ms.northwest + 1
-    else
-      math.max(ms.west, ms.north)
-  }
-
-  println("hello")
-  val result = new SyncVar[Int]
-  val root = SystolicArray(c0.length + 1, c1.length + 1, f3, result)
-  root.start()
-  root ! ((-1, -1) -> 1)
-  println("end result = " + result.take)
+trait SystolicArray[T] {
+  def start(): Unit
+  def put(v: T): Unit
+  def take: T
 }
 
 object SystolicArray {
+  import scala.actors.Actor
+  import scala.actors.Actor._
+  import scala.concurrent.SyncVar
 
-  type LazyArray[T] = Stream[Stream[Cell[T]]]
+  private type LazyArray[T] = Stream[Stream[Cell[T]]]
 
   type Pos = (Int, Int)
 
   type Acc[T] = (Pos, Map[Pos, T]) => T
 
-  def apply[T](n: Int, m: Int, f: Acc[T], result: SyncVar[T]) = {
-    require { 0 < n }
-    require { 0 < m }
-    lazy val a: LazyArray[T] = Stream.tabulate(n, m) {
-      (i, j) => new Cell(i, j, n, m, a, f, result)
+  def apply[T](rows: Int, cols: Int, f: Acc[T]): SystolicArray[T] = {
+    require { 0 < rows }
+    require { 0 < cols }
+    val result = new SyncVar[T]
+    lazy val a: LazyArray[T] = Stream.tabulate(rows, cols) {
+      (i, j) => new Cell(i, j, rows, cols, a, f, result)
     }
-    a(0)(0)
+    val root = a(0)(0)
+    new SystolicArray[T] {
+      override def start() { root.start() }
+      override def put(v: T) { root ! ((-1, -1) -> v) }
+      override def take = result.take
+    }
   }
 
-  class Cell[T](row: Int, col: Int, rows: Int, cols: Int, a: => LazyArray[T],
+  protected class Cell[T](row: Int, col: Int, rows: Int, cols: Int, a: => LazyArray[T],
       f: Acc[T], result: SyncVar[T]) extends Actor {
 
     require { 0 <= row && row < rows }
