@@ -36,9 +36,34 @@ object Main extends App {
       math.max(ms.west, ms.north)
   }
 
-  println("hello")
-  val root = SystolicArray(c0.length + 1, c1.length + 1, f3)
-  root.start()
-  root.put(1)
-  println("end result = " + root.take)
+  // "bare-metal" version of f3, does not run significantly faster
+  val f4 = (p: Pos, ms: Map[Pos, Int]) => {
+    if (p._1 == 0 || p._2 == 0)
+      0
+    else if (c0(p._1 - 1) == c1(p._2 - 1))
+      ms.get((p._1 - 1, p._2 - 1)).getOrElse(0) + 1
+    else
+      math.max(
+        ms.get((p._1 - 1, p._2)).getOrElse(0),
+        ms.get((p._1, p._2 - 1)).getOrElse(0))
+  }
+
+  def timedRun(l: String, n: Int, f: Acc[Int]) {
+    print("using " + l)
+    val time0 = System.currentTimeMillis
+    val root = SystolicArray(c0.length + 1, c1.length + 1, f)
+    root.start()
+    (1 to n) foreach { _ =>
+      root.put(1)
+      root.take
+    }
+    println(": total time = " + (System.currentTimeMillis - time0))
+  }
+
+  (1 to 10) foreach { _ =>
+    timedRun("f4", 100, f4)
+    timedRun("f3", 100, f3)
+  }
+
+  System.exit(0)
 }
