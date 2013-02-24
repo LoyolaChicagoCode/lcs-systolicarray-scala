@@ -12,6 +12,7 @@ object SystolicArray {
   import scala.actors.Actor
   import scala.actors.Actor._
   import scala.concurrent.SyncVar
+  import scala.language.implicitConversions
 
   private val logger = LoggerFactory.getLogger(getClass)
 
@@ -23,7 +24,7 @@ object SystolicArray {
 
   private val DEBUG = false
 
-  def apply[T](rows: Int, cols: Int, f: Acc[T]): SystolicArray[T] = {
+  def apply[T: Manifest](rows: Int, cols: Int, f: Acc[T]): SystolicArray[T] = {
     require { 0 < rows }
     require { 0 < cols }
     val result = new SyncVar[T]
@@ -38,7 +39,7 @@ object SystolicArray {
     }
   }
 
-  protected class Cell[T](row: Int, col: Int, rows: Int, cols: Int, a: => LazyArray[T],
+  protected class Cell[T: Manifest](row: Int, col: Int, rows: Int, cols: Int, a: => LazyArray[T],
       f: Acc[T], result: SyncVar[T]) extends Actor {
 
     require { 0 <= row && row < rows }
