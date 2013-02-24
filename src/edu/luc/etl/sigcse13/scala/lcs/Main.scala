@@ -5,7 +5,7 @@ import scala.actors.Actor._
 import scala.concurrent.SyncVar
 
 object Main extends App {
-  import SystolicArray.{Pos,mapToHelper}
+  import SystolicArray._
 
   val f1 = (p: Pos, ms: Map[Pos, Int]) => ms.values.sum
 
@@ -28,9 +28,9 @@ object Main extends App {
     *
     */
 
-    if (p._1 == 0 || p._2 == 0) // TODO pimped edge checker
+    if (p.isOnEdge)
       0
-    else if (c0(p._1 - 1) == c1(p._2 - 1)) // TODO pimp this
+    else if (c0(p.north) == c1(p.west))
       ms.northwest + 1
     else
       math.max(ms.west, ms.north)
@@ -116,5 +116,13 @@ object SystolicArray {
     def north    (implicit current: (Pos, T)): T = ms.get((current._1._1 - 1, current._1._2    )).getOrElse(current._2)
     def west     (implicit current: (Pos, T)): T = ms.get((current._1._1    , current._1._2 - 1)).getOrElse(current._2)
     def northwest(implicit current: (Pos, T)): T = ms.get((current._1._1 - 1, current._1._2 - 1)).getOrElse(current._2)
+  }
+
+  implicit def posToHelper(p: Pos): PosHelper = new PosHelper(p)
+
+  class PosHelper(p: Pos) {
+    def north = p._1 - 1
+    def west = p._2 - 1
+    def isOnEdge = p._1 == 0 || p._2 == 0
   }
 }
