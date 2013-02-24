@@ -17,6 +17,10 @@ object SystolicArray {
 
   type Acc[T] = (Pos, Map[Pos, T]) => T
 
+  private val DEBUG = false
+
+  private def log(s: => String) { if (DEBUG) println(s) }
+
   def apply[T](rows: Int, cols: Int, f: Acc[T]): SystolicArray[T] = {
     require { 0 < rows }
     require { 0 < cols }
@@ -38,13 +42,13 @@ object SystolicArray {
     require { 0 <= row && row < rows }
     require { 0 <= col && col < cols }
 
-    println("creating (" + row + ", " + col + ")")
+    log("creating (" + row + ", " + col + ")")
 
     override def act() {
-      println("starting (" + row + ", " + col + ")")
+      log("starting (" + row + ", " + col + ")")
       var start = true
       loop {
-        println("waiting  (" + row + ", " + col + ")")
+        log("waiting  (" + row + ", " + col + ")")
         barrier(if (row == 0 || col == 0) 1 else 3) { ms =>
           if (start) { startNeighbors() ; start = false }
           propagate(ms)
@@ -53,14 +57,14 @@ object SystolicArray {
       }
     }
 
-    protected def barrier(n : Int)(p: Map[Pos, T] => Unit): Unit =
-      barrier1(n)(p)(Map.empty)
+    protected def barrier(n: Int)(f: Map[Pos, T] => Unit): Unit =
+      barrier1(n)(f)(Map.empty)
 
-    protected def barrier1(n : Int)(p: Map[Pos, T] => Unit)(ms: Map[Pos, T]): Unit = {
+    protected def barrier1(n: Int)(f: Map[Pos, T] => Unit)(ms: Map[Pos, T]): Unit = {
       if (n <= 0)
-        p(ms)
+        f(ms)
       else
-        react { case m: (Pos, T) => barrier1(n - 1)(p)(ms + m) }
+        react { case (p: Pos, v: T) => barrier1(n - 1)(f)(ms + (p -> v)) }
       // one-way message: anything after react is skipped!
     }
 
@@ -73,11 +77,11 @@ object SystolicArray {
     protected def propagate(ms: Map[Pos, T]) {
       val r = f((row, col), ms)
       val m = (row, col) -> r
-      println("firing   " + m)
+      log("firing   " + m)
       if (row < rows - 1)                     a(row + 1)(col    ) ! m
       if (col < cols - 1)                     a(row    )(col + 1) ! m
       if (row < rows - 1 && col < cols - 1)   a(row + 1)(col + 1) ! m
-      if (row >= rows - 1 && col >= cols - 1) result.set(r)
+      if (row >= rows - 1 && col >= cols - 1) result.put(r)
     }
   }
 
