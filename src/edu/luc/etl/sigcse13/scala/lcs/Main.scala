@@ -38,7 +38,7 @@ object Main extends App {
 
   println("hello")
   val result = new SyncVar[Int]
-  val root = SystolicArray(c0.length, c1.length, f3, result)
+  val root = SystolicArray(c0.length + 1, c1.length + 1, f3, result)
   root.start()
   root ! ((-1, -1) -> 1)
   println("end result = " + result.take)
