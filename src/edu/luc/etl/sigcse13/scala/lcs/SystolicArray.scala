@@ -1,20 +1,22 @@
 package edu.luc.etl.sigcse13.scala.lcs
 
-import org.slf4j.LoggerFactory
-
+/**
+ * An abstraction of a systolic array.
+ */
 trait SystolicArray[T] {
   def start(): Unit
   def put(v: T): Unit
-  def take: T
+  def take(): T
 }
 
+/**
+ * The companion object for the systolic array abstracion.
+ */
 object SystolicArray {
   import scala.actors.Actor
   import scala.actors.Actor._
   import scala.concurrent.SyncVar
   import scala.language.implicitConversions
-
-  private val logger = LoggerFactory.getLogger(getClass)
 
   private type LazyArray[T] = Stream[Stream[Cell[T]]]
 
@@ -22,9 +24,20 @@ object SystolicArray {
 
   type Acc[T] = (Pos, Map[Pos, T]) => T
 
-  private val DEBUG = false
+  /**
+   * Mini-logger structurally compatible with slf4j.
+   */
+  private object logger {
+    private val DEBUG = false
+    // use call-by-name to ensure the argument is evaluated on demand only
+    def debug(msg: => String) { if (DEBUG) println("debug: " + msg) }
+    // add other log levels as needed
+  }
 
-  def apply[T: Manifest](rows: Int, cols: Int, f: Acc[T]): SystolicArray[T] = {
+  /**
+   * Factory method.
+   */
+  def apply[T](rows: Int, cols: Int, f: Acc[T]): SystolicArray[T] = {
     require { 0 < rows }
     require { 0 < cols }
     val result = new SyncVar[T]
@@ -33,13 +46,16 @@ object SystolicArray {
     }
     val root = a(0)(0)
     new SystolicArray[T] {
-      override def start() { root.start() }
+      override def start() = root.start()
       override def put(v: T) { root ! ((-1, -1) -> v) }
-      override def take = result.take
+      override def take() = result.take()
     }
   }
 
-  protected class Cell[T: Manifest](row: Int, col: Int, rows: Int, cols: Int, a: => LazyArray[T],
+  /**
+   * Internal cell implementation based on Scala actors.
+   */
+  protected class Cell[T](row: Int, col: Int, rows: Int, cols: Int, a: => LazyArray[T],
       f: Acc[T], result: SyncVar[T]) extends Actor {
 
     require { 0 <= row && row < rows }
@@ -88,6 +104,9 @@ object SystolicArray {
     }
   }
 
+  /**
+   * Conversion for adding navigation methods to Map.
+   */
   implicit def mapToHelper[T](ms: Map[Pos, T]): Helper[T] = new Helper(ms)
 
   class Helper[T](ms: Map[Pos, T]) {
@@ -96,6 +115,9 @@ object SystolicArray {
     def northwest(implicit current: (Pos, T)): T = ms.get((current._1._1 - 1, current._1._2 - 1)).getOrElse(current._2)
   }
 
+  /**
+   * Conversion for adding navigation methods to Pos.
+   */
   implicit def posToHelper(p: Pos): PosHelper = new PosHelper(p)
 
   class PosHelper(p: Pos) {

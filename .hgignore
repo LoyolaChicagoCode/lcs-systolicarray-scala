@@ -21,8 +21,6 @@ tmp/
 # Local configuration file (sdk path, etc)
 local.properties
 .cache
-.classpath
-.project
 .settings/
 
 # Emacs files

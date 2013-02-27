@@ -1,5 +1,8 @@
 package edu.luc.etl.sigcse13.scala.lcs
 
+/**
+ * Fixtures for the tests.
+ */
 object Fixtures {
   import SystolicArray._
 

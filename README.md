@@ -1,19 +1,15 @@
-#Running main
+# Overview
 
-sbt test:run
+An implementation of least common subsequence (LCS) based on a systolic array
+implemented as Scala actors.
 
-#Running tests
+# Running the sample application
 
-sbt test
+- navigate to `test > edu.luc.etl.sigcse13.scala.lcs > Main.scala`
+- right-click Main.scala > Run As > Scala Application
 
-#Logging
+# Running the tests
 
-See src/main/resources/logback.xml
+- right-click tests > Run As > Scala JUnit tests
 
-#Eclipse
-
-sbt eclipse
-
-Then import into Eclipse and delete {src,test}/main/java.
-
-Run specs as ordinary Java unit tests.
+See also near the end of [this document](http://scala-ide.org/docs/user/testingframeworks.html).

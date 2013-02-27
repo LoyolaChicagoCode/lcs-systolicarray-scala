@@ -1,5 +1,8 @@
 package edu.luc.etl.sigcse13.scala.lcs
 
+/**
+ * Object containing the LCS implementation based on systolic arrays.
+ */
 object lcs {
   import SystolicArray._
 

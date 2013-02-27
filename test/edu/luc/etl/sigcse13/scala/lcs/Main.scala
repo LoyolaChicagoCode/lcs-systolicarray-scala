@@ -1,5 +1,8 @@
 package edu.luc.etl.sigcse13.scala.lcs
 
+/**
+ * Main method with timing.
+ */
 object Main extends App {
   import SystolicArray._
   import Fixtures._
