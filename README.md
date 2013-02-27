@@ -5,7 +5,7 @@ implemented as Scala actors.
 
 # Running the sample application
 
-- navigate to `test > edu.luc.etl.sigcse13.scala.lcs > Main.scala`
+- navigate to test > edu.luc.etl.sigcse13.scala.lcs > Main.scala
 - right-click Main.scala > Run As > Scala Application
 
 # Running the tests
