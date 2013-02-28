@@ -15,7 +15,7 @@ implemented as Scala actors.
 
 or simply
 
-    $ sbt test:test
+    $ sbt test
 
 # Eclipse
 
