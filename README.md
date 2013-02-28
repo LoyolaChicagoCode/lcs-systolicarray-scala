@@ -19,6 +19,10 @@ or simply
 
 # Eclipse
 
+## Generating the configuration files
+
+    $ sbt eclipse
+
 ## Running the sample application
 
 - navigate to test > edu.luc.etl.sigcse13.scala.lcs > Main.scala
