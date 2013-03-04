@@ -3,6 +3,7 @@ package edu.luc.etl.sigcse13.scala.lcs
 /**
  * Fixtures for the tests.
  */
+// begin-lcs-Fixtures
 object Fixtures {
   import SystolicArray._
 
@@ -31,3 +32,4 @@ object Fixtures {
         ms.get((p._1, p._2 - 1)).getOrElse(0))
   }
 }
+// end-lcs-Fixtures

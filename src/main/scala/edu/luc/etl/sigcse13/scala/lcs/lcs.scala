@@ -3,6 +3,7 @@ package edu.luc.etl.sigcse13.scala.lcs
 /**
  * Object containing the LCS implementation based on systolic arrays.
  */
+// begin-object-lcs
 object lcs {
   import SystolicArray._
 
@@ -23,3 +24,4 @@ object lcs {
     root.take
   }
 }
+// end-object-lcs

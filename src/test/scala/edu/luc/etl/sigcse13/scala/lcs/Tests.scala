@@ -7,6 +7,7 @@ import Fixtures._
 /**
  * Simple JUnit-based tests.
  */
+// begin-lcs-Tests
 class Tests {
 
   @Test def testSum() {
@@ -20,3 +21,4 @@ class Tests {
     assertEquals(53, lcs(c0, c1))
   }
 }
+// end-lcs-Tests

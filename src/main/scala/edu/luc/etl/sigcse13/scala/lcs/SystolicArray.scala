@@ -1,17 +1,19 @@
 package edu.luc.etl.sigcse13.scala.lcs
 
-/**
- * An abstraction of a systolic array.
- */
+
+// An abstraction of a systolic array.
+
+// begin-trait-SystolicArray
 trait SystolicArray[T] {
   def start(): Unit
   def put(v: T): Unit
   def take(): T
 }
+// end-trait-SystolicArray
 
-/**
- * The companion object for the systolic array abstracion.
- */
+// The companion object for the systolic array abstracion.
+
+// begin-object-SystolicArray
 object SystolicArray {
   import scala.actors.Actor
   import scala.actors.Actor._
@@ -24,19 +26,18 @@ object SystolicArray {
 
   type Acc[T] = (Pos, Map[Pos, T]) => T
 
-  /**
-   * Mini-logger structurally compatible with slf4j.
-   */
+  // Mini-logger structurally compatible with slf4j.
+  // begin-object-logger
   private object logger {
     private val DEBUG = false
     // use call-by-name to ensure the argument is evaluated on demand only
     def debug(msg: => String) { if (DEBUG) println("debug: " + msg) }
     // add other log levels as needed
   }
+  // end-object-logger
 
-  /**
-   * Factory method.
-   */
+  // Factory method
+  // begin-object-apply
   def apply[T](rows: Int, cols: Int, f: Acc[T]): SystolicArray[T] = {
     require { 0 < rows }
     require { 0 < cols }
@@ -51,10 +52,11 @@ object SystolicArray {
       override def take() = result.take()
     }
   }
+  // end-object-apply
 
-  /**
-   * Internal cell implementation based on Scala actors.
-   */
+
+  // Internal cell implementation based on Scala actors.
+  // begin-class-Cell
   protected class Cell[T](row: Int, col: Int, rows: Int, cols: Int, a: => LazyArray[T],
       f: Acc[T], result: SyncVar[T]) extends Actor {
 
@@ -103,10 +105,10 @@ object SystolicArray {
       if (row >= rows - 1 && col >= cols - 1) result.put(r)
     }
   }
+  // end-class-Cell
 
-  /**
-   * Conversion for adding navigation methods to Map.
-   */
+  // Conversion for adding navigation methods to Map.
+  // begin-mapToHelper
   implicit def mapToHelper[T](ms: Map[Pos, T]): Helper[T] = new Helper(ms)
 
   class Helper[T](ms: Map[Pos, T]) {
@@ -114,10 +116,10 @@ object SystolicArray {
     def west     (implicit current: (Pos, T)): T = ms.get((current._1._1    , current._1._2 - 1)).getOrElse(current._2)
     def northwest(implicit current: (Pos, T)): T = ms.get((current._1._1 - 1, current._1._2 - 1)).getOrElse(current._2)
   }
+  // end-mapToHelper
 
-  /**
-   * Conversion for adding navigation methods to Pos.
-   */
+  // Conversion for adding navigation methods to Pos.
+  // begin-posToHelper
   implicit def posToHelper(p: Pos): PosHelper = new PosHelper(p)
 
   class PosHelper(p: Pos) {
@@ -125,4 +127,6 @@ object SystolicArray {
     def west = p._2 - 1
     def isOnEdge = p._1 == 0 || p._2 == 0
   }
+  // end-posToHelper
 }
+// end-object-SystolicArray
