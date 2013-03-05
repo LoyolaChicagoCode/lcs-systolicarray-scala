@@ -21,7 +21,7 @@ These really are the only required prerequisites.
 
 ## Running the sample application
 
-    $ sbt test:run
+    $ sbt 'test:run string0 string1 [ numberOfRuns ]'
 
 ## Running the tests
 
@@ -40,7 +40,9 @@ or simply
 ## Running the sample application
 
 - navigate to test > edu.luc.etl.sigcse13.scala.lcs > Main.scala
-- right-click Main.scala > Run As > Scala Application
+- right-click Main.scala > Run Configurations
+- click on the Arguments tab and enter the two strings and optionally the
+  number of times to run
 
 ## Running the tests
 
