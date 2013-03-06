@@ -16,10 +16,12 @@ object Main extends {
       val n  = if (args.length == 3) args(2).toInt else 1
       timedRun(s0, s1, n, lcs.f(s0, s1) _)
     } catch {
-      case _: Throwable =>
-        Console.err.println("usage: string0 string1 [ numberOfRuns ]")
+      case _: NumberFormatException => usage()
+      case _: IllegalArgumentException => usage()
     }
   }
+
+  def usage() { Console.err.println("usage: string0 string1 [ numberOfRuns ]") }
 
   def timedRun(s0: String, s1: String, n: Int, f: Acc[Int]) {
     val time0 = System.currentTimeMillis
