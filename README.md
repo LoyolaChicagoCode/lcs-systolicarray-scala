@@ -21,7 +21,17 @@ These really are the only required prerequisites.
 
 ## Running the sample application
 
-    $ sbt 'test:run string0 string1 [ numberOfRuns ]'
+During development:
+
+    $ sbt 'run string0 string1 [ numberOfRuns ]'
+
+During production, first create the startup script:
+
+    $ sbt stage
+
+Then run the application outside of sbt like this:
+
+    $ target/start string0 string1 [ numberOfRuns ]
 
 ## Running the tests
 

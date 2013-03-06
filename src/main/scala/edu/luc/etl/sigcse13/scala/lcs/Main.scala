@@ -1,11 +1,12 @@
 package edu.luc.etl.sigcse13.scala.lcs
 
+import SystolicArray.Acc
+
 /**
  * Main method with timing.
  */
 object Main extends {
   import SystolicArray._
-  import Fixtures._
 
   def main(args: Array[String]) {
     try {
@@ -13,7 +14,7 @@ object Main extends {
       val s0 = args(0)
       val s1 = args(1)
       val n  = if (args.length == 3) args(2).toInt else 1
-      timedRun(s0, s1, n, f3)
+      timedRun(s0, s1, n, lcs.f(s0, s1) _)
     } catch {
       case _: Throwable =>
         Console.err.println("usage: string0 string1 [ numberOfRuns ]")
