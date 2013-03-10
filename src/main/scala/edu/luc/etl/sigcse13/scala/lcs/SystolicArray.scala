@@ -120,9 +120,7 @@ object SystolicArray {
 
   // Conversion for adding navigation methods to Map.
   // begin-mapToHelper
-  implicit def mapToHelper[T](ms: Map[Pos, T]): Helper[T] = new Helper(ms)
-
-  class Helper[T](ms: Map[Pos, T]) {
+  implicit class Helper[T](ms: Map[Pos, T]) {
     def north    (implicit current: (Pos, T)): T = ms.get((current._1._1 - 1, current._1._2    )).getOrElse(current._2)
     def west     (implicit current: (Pos, T)): T = ms.get((current._1._1    , current._1._2 - 1)).getOrElse(current._2)
     def northwest(implicit current: (Pos, T)): T = ms.get((current._1._1 - 1, current._1._2 - 1)).getOrElse(current._2)
@@ -131,9 +129,7 @@ object SystolicArray {
 
   // Conversion for adding navigation methods to Pos.
   // begin-posToHelper
-  implicit def posToHelper(p: Pos): PosHelper = new PosHelper(p)
-
-  class PosHelper(p: Pos) {
+  implicit class PosHelper(p: Pos) {
     def north = p._1 - 1
     def west = p._2 - 1
     def isOnEdge = p._1 == 0 || p._2 == 0
